@@ -85,7 +85,7 @@ def parse_html(url):
         pattern = r'Option '+chosen_option+' ID :(\d+)'
         match = re.search(pattern, question.text)
         chosen_option_id = match.group(1)
-        if correct_ans_id == int(0):
+        if correct_ans_id == str(0):
             score+=5
             answers += question_number + "-Correct   "
             correct += 1
