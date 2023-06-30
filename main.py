@@ -14,10 +14,49 @@ def parse_html(url):
     page = requests.get(url)
     page_content = BeautifulSoup(page.content, "lxml")
     questions = page_content.find_all('table',class_="questionPnlTbl")
+    sections = page_content.find_all('div',class_="section-lbl")
+    main_info = page_content.find_all('div',class_="main-info-pnl")
+    user_info = {}
+    user_info["Application Number"] = re.search(r"Application No (\w+)", main_info[0].text).group(1)
+    user_info["Candidate Name"] = re.search(r"(?<=Candidate Name )\w+ \w+", main_info[0].text).group()
+    user_info["Roll No"] = re.search(r"Roll No (\w+)", main_info[0].text).group(1)
+
+    date_pattern = r"\d{2}/\d{2}/\d{4}" 
+    dates = re.findall(date_pattern, main_info[0].text)
+
+    user_info["Test Date"] = dates[0]
+    time_range_pattern = r"\d{1,2}:\d{2} [APM]{2} - \d{1,2}:\d{2} [APM]{2}"  # Regular expression pattern to match time range in the format "H:MM AM/PM - H:MM AM/PM"
+    time_range = re.search(time_range_pattern, main_info[0].text)
+    user_info["Test Time"] = time_range[0]
+    
     score = 0
-    answers = {}
+    answers = ""
+    output = {}
+    output["Total Sections"] = len(sections)
+    correct = 0
+    incorrect = 0
+    unanswered = 0
     count = 0
+    section_number = 0
     for question in questions:
+        question_number = re.findall(r'Q.\d+', question.text)[0]
+        if question_number == "Q.1":
+            output["Section"+str(section_number+1)+" Name"] =  sections[section_number].text.replace('\u00a0', '').replace('Section :', '')+" "
+            if section_number != 0:
+                
+                output["Section"+str(int(section_number))+" Score"] = score
+                output["Section"+str(int(section_number))+" Answers"] = answers
+                output["Section"+str(int(section_number))+" Correct Answers"] = correct
+                output["Section"+str(int(section_number))+" Incorrect Answers"] = incorrect
+                output["Section"+str(int(section_number))+" Unanswered Answers"] = unanswered
+                output["Section"+str(int(section_number))+" Total Questions"] = count
+                count = 0
+                correct = 0
+                incorrect = 0
+                unanswered = 0
+                answers = ""
+                score = 0
+            section_number += 1
         pattern = r'Question ID :(\d+)'
         match = re.search(pattern, question.text)
         question_id = match.group(1)
@@ -33,7 +72,8 @@ def parse_html(url):
             count += 1
         except:
             count += 1
-            answers["q"+str(count)] = "not answered"
+            answers += question_number + " Not Answered   "
+            unanswered +=1
             
             continue
 
@@ -42,14 +82,25 @@ def parse_html(url):
         pattern = r'Option '+chosen_option+' ID :(\d+)'
         match = re.search(pattern, question.text)
         chosen_option_id = match.group(1)
+        if correct_ans_id == int(0):
+            score+=5
+            answers += question_number + " Correct   "
+            correct += 1
+            continue
         if chosen_option_id == correct_ans_id:
-            answers["q"+str(count)] = "correct"
+            answers += question_number + " Correct   "
+            correct += 1
             score += 5
         else:
-            answers["q"+str(count)] = "incorrect"
+            answers += question_number + " Incorrect   "
+            incorrect += 1
             score -= 1
-    answers["score"] = score
-
-    return jsonify(answers), 200 
+    output["Section"+str(int(section_number))+" Score"] = score
+    output["Section"+str(int(section_number))+" Answers"] = answers
+    output["Section"+str(int(section_number))+" Correct Answers"] = correct
+    output["Section"+str(int(section_number))+" Incorrect Answers"] = incorrect
+    output["Section"+str(int(section_number))+" Unanswered Answers"] = unanswered
+    output["Section"+str(int(section_number))+" Total Questions"] = count
+    return jsonify(user_info, output), 200 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')
