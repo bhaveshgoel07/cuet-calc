@@ -17,7 +17,10 @@ def parse_html(url):
     sections = page_content.find_all('div',class_="section-lbl")
     main_info = page_content.find_all('div',class_="main-info-pnl")
     user_info = {}
-    user_info["Application Number"] = re.search(r"Application No (\w+)", main_info[0].text).group(1)
+    try:
+        user_info["Application Number"] = re.search(r"Application No (\w+)", main_info[0].text).group(1)
+    except:
+        user_info["Application Number"] = " "
     try:
         user_info["Candidate Name"] = re.search(r"(?<=Candidate Name )\w+ \w+", main_info[0].text).group()
     except:
