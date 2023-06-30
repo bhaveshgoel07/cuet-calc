@@ -18,7 +18,10 @@ def parse_html(url):
     main_info = page_content.find_all('div',class_="main-info-pnl")
     user_info = {}
     user_info["Application Number"] = re.search(r"Application No (\w+)", main_info[0].text).group(1)
-    user_info["Candidate Name"] = re.search(r"(?<=Candidate Name )\w+ \w+", main_info[0].text).group()
+    try:
+        user_info["Candidate Name"] = re.search(r"(?<=Candidate Name )\w+ \w+", main_info[0].text).group()
+    except:
+        user_info["Candidate Name"] = re.search(r"(?<=Candidate Name )\w+", main_info[0].text).group()
     user_info["Roll No"] = re.search(r"Roll No (\w+)", main_info[0].text).group(1)
 
     date_pattern = r"\d{2}/\d{2}/\d{4}" 
