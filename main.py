@@ -72,7 +72,7 @@ def parse_html(url):
             count += 1
         except:
             count += 1
-            answers += question_number + " Not Answered   "
+            answers += question_number + "-Unanswered   "
             unanswered +=1
             
             continue
@@ -84,15 +84,15 @@ def parse_html(url):
         chosen_option_id = match.group(1)
         if correct_ans_id == int(0):
             score+=5
-            answers += question_number + " Correct   "
+            answers += question_number + "-Correct   "
             correct += 1
             continue
         if chosen_option_id == correct_ans_id:
-            answers += question_number + " Correct   "
+            answers += question_number + "-Correct   "
             correct += 1
             score += 5
         else:
-            answers += question_number + " Incorrect   "
+            answers += question_number + "-Incorrect   "
             incorrect += 1
             score -= 1
     output["Section"+str(int(section_number))+" Score"] = score
