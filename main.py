@@ -82,9 +82,10 @@ def parse_html(url):
             unanswered +=1
             
             continue
-
-        correct_ans_id = str(ans_key[int(question_id)])
-
+        try:
+            correct_ans_id = str(ans_key[int(question_id)])
+        except:
+            continue
         pattern = r'Option '+chosen_option+' ID :(\d+)'
         match = re.search(pattern, question.text)
         chosen_option_id = match.group(1)
