@@ -108,7 +108,7 @@ def parse_html(url):
     output["Section"+str(int(section_number))+" Incorrect Answers"] = incorrect
     output["Section"+str(int(section_number))+" Unanswered Answers"] = unanswered
     output["Section"+str(int(section_number))+" Total Questions"] = count
-    output_url = "https://aceipm.com/scorecard"+output["Total Sections"]+"/?candidatename="+user_info['Candidate Name']+"&appno="+user_info["Application Number"]+"&rollno="+user_info["Roll No"] +"&testdate="+user_info["Test Date"]+"&testtime="+user_info["Test Time"]+
+    # output_url = "https://aceipm.com/scorecard"+output["Total Sections"]+"/?candidatename="+user_info['Candidate Name']+"&appno="+user_info["Application Number"]+"&rollno="+user_info["Roll No"] +"&testdate="+user_info["Test Date"]+"&testtime="+user_info["Test Time"]+"&subject"
     return jsonify(user_info, output), 200 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')
