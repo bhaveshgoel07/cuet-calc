@@ -3,6 +3,8 @@ from bs4 import BeautifulSoup
 import requests
 import re
 from flask import Flask, jsonify
+import urllib.parse
+
 
 df = pd.read_excel("anskey.xlsx")
 ans_key = df.set_index('Question ID')['Correct Option ID'].to_dict()
@@ -108,6 +110,52 @@ def parse_html(url):
     output["Section"+str(int(section_number))+" Incorrect Answers"] = incorrect
     output["Section"+str(int(section_number))+" Unanswered Answers"] = unanswered
     output["Section"+str(int(section_number))+" Total Questions"] = count
+    
+    # Custom function to replace spaces with "%20" using urllib.parse.quote()
+    def replace_spaces(text):
+        return urllib.parse.quote(text, safe='')
+
+    # ... existing code ...
+
+    # Generate the output URL by combining the base URL and encoded parameters
+    base_url = "https://aceipm.com/scorecard2/"
+
+    # Create a dictionary for storing the URL parameters
+    url_params = {
+        "candidatename": replace_spaces(user_info["Candidate Name"]),
+        "appno": user_info["Application Number"],
+        "rollno": user_info["Roll No"],
+        "testdate": user_info["Test Date"],
+        "testtime": user_info["Test Time"]
+
+    }
+
+    # Iterate over the sections to extract relevant information
+    for section_num in range(1, len(sections) + 1):
+        section_name = output.get("Section{} Name".format(section_num), "")
+        section_score = output.get("Section{} Score".format(section_num), "")
+        section_answers = output.get("Section{} Answers".format(section_num), "")
+        section_correct = output.get("Section{} Correct Answers".format(section_num), "")
+        section_incorrect = output.get("Section{} Incorrect Answers".format(section_num), "")
+        section_unanswered = output.get("Section{} Unanswered Answers".format(section_num), "")
+        section_total_questions = output.get("Section{} Total Questions".format(section_num), "")
+
+        # Add the section information to the URL parameters
+        url_params["subject{}".format(section_num)] = replace_spaces(section_name)
+        url_params["totalq{}".format(section_num)] = section_total_questions
+        url_params["correct{}".format(section_num)] = section_correct
+        url_params["incorrect{}".format(section_num)] = section_incorrect
+        url_params["unanswered{}".format(section_num)] = section_unanswered
+        url_params["totalscore{}".format(section_num)] = section_score
+        url_params["descriptive{}".format(section_num)] = replace_spaces(section_answers)
+
+    # Generate the output URL by combining the base URL and encoded parameters
+    output_url = base_url + "?" + urllib.parse.urlencode(url_params)
+    output_url = output_url.replace("%2520", "%20")
+    
+
+    
+
     # output_url = "https://aceipm.com/scorecard"+output["Total Sections"]+"/?candidatename="+user_info['Candidate Name']+"&appno="+user_info["Application Number"]+"&rollno="+user_info["Roll No"] +"&testdate="+user_info["Test Date"]+"&testtime="+user_info["Test Time"]+"&subject"
     return jsonify(user_info, output), 200 
 if __name__ == "__main__":
