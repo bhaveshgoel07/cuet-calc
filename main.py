@@ -153,12 +153,12 @@ def parse_html(url):
     output_url = base_url + "?" + urllib.parse.urlencode(url_params)
     output_url = output_url.replace("%2520", "%20")
     
-    data1 = jsonify(user_info, output)
-    data_df = pd.DataFrame(data1)
-    data_df.to_csv("data.csv")
+    # data1 = jsonify(user_info, output)
+    # data_df = pd.DataFrame(data1)
+    # data_df.to_csv("data.csv")
     
 
     # output_url = "https://aceipm.com/scorecard"+output["Total Sections"]+"/?candidatename="+user_info['Candidate Name']+"&appno="+user_info["Application Number"]+"&rollno="+user_info["Roll No"] +"&testdate="+user_info["Test Date"]+"&testtime="+user_info["Test Time"]+"&subject"
-    return data, 200 
+    return output, 200 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')
