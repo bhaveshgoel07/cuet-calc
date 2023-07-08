@@ -159,6 +159,6 @@ def parse_html(url):
     
 
     # output_url = "https://aceipm.com/scorecard"+output["Total Sections"]+"/?candidatename="+user_info['Candidate Name']+"&appno="+user_info["Application Number"]+"&rollno="+user_info["Roll No"] +"&testdate="+user_info["Test Date"]+"&testtime="+user_info["Test Time"]+"&subject"
-    return output, 200 
+    return jsonify(user_info, output), 200 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')
